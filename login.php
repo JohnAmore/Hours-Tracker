@@ -10,30 +10,34 @@
 <?php
 session_start();
 
-// Check if an error message is set
+// Check if an error message is returned from loginRedirect.
 $error_message = isset($_GET['error']) ? $_GET['error'] : '';
 
 // Display error message if it exists
 if (!empty($error_message)) {
 
-    
+    /* This is the error message that is received from loginRedirect, displayed on top of the form.
+       Interactable. On click changes visibility.
+    */
     echo '<div class ="errorDiv" id="hideable">
     <button onClick="hide()"class="clickable">
-    <span class="errorP">' . $error_message . '</span>
+    <span class="errorP">'. $error_message .'</span>
     </button>
     </div>';
 }
 ?>
     <script>
-        function hide() 
+        // JavaScript function to hide the error message div.
+    function hide() 
+    {
+        var x = document.getElementById("hideable");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        }else 
         {
-    var x = document.getElementById("hideable");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-        
-    }
+            x.style.display = "none";
+            
+        }
     }
     </script>
     <div class="parent">
@@ -56,6 +60,8 @@ if (!empty($error_message)) {
                 <input type="password" name="password" id="password"><br>
                 <input type="submit" class="SubmitButton">
             </form>
+            <h3 class="title">New to Hours Tracker?</h3>
+            <a href="register.php"><button class="SubmitButton">Register Here!</button></a>
         </div>
         
     </div>

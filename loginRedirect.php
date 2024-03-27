@@ -55,7 +55,7 @@
     }
     
     // Get user details so we can use it for cookie sending later.
-    $row = $result->fetch_assoc();
+    $row = $result->fetch_assoc(); //Convert result into an associative array.
     $userID = $row['user_id'];
     $username = $row['username'];
     
