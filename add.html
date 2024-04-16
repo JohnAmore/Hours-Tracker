@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add an Entry</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<!-- 
+    2024-04-01 09:55:12 - Sample Format
+-->
+
+<body>
+    <div class="parent">
+        <div class="topBar">
+            <span class="icon">
+                <img src="stopwatch.png" id="icon">
+                <!-- Attribution to flaticon.com -->
+            </span>
+            <span class="title">
+                <h2 class="title">Hours Tracker</h2>
+            </span>
+
+            <!-- TODO: Centered Title, icon, goes here! -->
+        </div>
+        <div class="formHolder">
+            <form action="addRedirect.php" class="login" method="post" style="min-width: 25rem; min-height: 10rem;">
+                <label for="startTime">Start Time</label>
+                <input type="datetime-local" name="" id="startTime" style="padding: .5rem;">
+                <label for="endTime">End Time</label>
+                <input type="datetime-local" name="" id="endTime" style="padding: .5rem;">
+                <input type="submit" class="SubmitButton" style="margin-top: 1rem;">
+            </form>
+        </div>
+    </div>
+
+    <footer class="foot">
+        <p>Attributions: Stopwatch Icon, <a href="https://www.flaticon.com/free-icons/timer"
+                title="Stopwatch Timer Icon">
+                Timer icons created by Freepik - Flaticon</a><br>
+            &copy; Copyright 2024 Daniel Bennett, Carson-Newman University</p>
+    </footer>
+</body>
+
+</html>

@@ -7,7 +7,7 @@ class DataBaseReader
     private $conn;
     private $db;
 
-    function __construct($db, $file)
+    function __construct($file, $db)
     {
         $newFile = file($file);
         $credentials = array(); // Array to store credentials
@@ -20,10 +20,31 @@ class DataBaseReader
             $credentials[trim($parts[0])] = trim($parts[1]);
         }
         $this->conn = new mysqli($credentials['hostname'], $credentials['username'], $credentials['password'], $db);
-        if ($this->conn->connect_error) {
-            exit("Connection failed: " . $this->conn->connect_error);
-        } else {
-            echo "Connection Success!";
+    }
+
+    function getTimes()
+    {
+        $sql = "SELECT * FROM `times`";
+        $sqlStatement = $this->conn->prepare($sql); // $sqlStatement parses the SQL line above and reads the question mark as a placeholder.
+        $sqlStatement->execute(); // Sends the line of code.
+        $result = $sqlStatement->get_result();
+        return $result;
+    }
+
+    function deleteEntry($id)
+    {
+        $sql = "DELETE FROM times WHERE `times`.`entry` = ?";
+        $sqlStatement = $this->conn->prepare($sql); // $sqlStatement parses the SQL line above and reads the question mark as a placeholder.
+        $sqlStatement->bind_param("s", $id); //Bind $id to ?
+        $sqlStatement->execute(); // Sends the line of code.
+        if ($result = $sqlStatement->get_result()) {
+            echo "<script>console.log('Success!');</script>";
         }
+    }
+
+
+    //2024-04-01 09:55:12 - Sample Format
+    function addEntry($year, $month, $day, $startTime, $endTime)
+    {
     }
 }
