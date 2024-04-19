@@ -7,7 +7,8 @@ class DataBaseReader
     private $conn;
     private $db;
 
-    function __construct($file, $db)
+
+    function __construct($file, $db = null)
     {
         $newFile = file($file);
         $credentials = array(); // Array to store credentials
@@ -19,7 +20,9 @@ class DataBaseReader
             //Trim whitespace.
             $credentials[trim($parts[0])] = trim($parts[1]);
         }
-        $this->conn = new mysqli($credentials['hostname'], $credentials['username'], $credentials['password'], $db);
+        if ($db != null) {
+            $this->conn = new mysqli($credentials['hostname'], $credentials['username'], $credentials['password'], $db);
+        }
     }
 
     function getTimes()
@@ -28,6 +31,8 @@ class DataBaseReader
         $sqlStatement = $this->conn->prepare($sql); // $sqlStatement parses the SQL line above and reads the question mark as a placeholder.
         $sqlStatement->execute(); // Sends the line of code.
         $result = $sqlStatement->get_result();
+
+        $result = $result->fetch_all();
         return $result;
     }
 
@@ -44,7 +49,15 @@ class DataBaseReader
 
 
     //2024-04-01 09:55:12 - Sample Format
-    function addEntry($year, $month, $day, $startTime, $endTime)
+    function addEntry($startTime, $endTime)
     {
+        $sql = "INSERT INTO times(startTime, endTime) VALUES (?, ?)";
+        $sqlStatement = $this->conn->prepare($sql);
+        $sqlStatement->bind_param("ss", $startTime, $endTime);
+        if ($sqlStatement->execute()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

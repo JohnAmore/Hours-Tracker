@@ -8,19 +8,22 @@ class DatabaseLogin
 
   private $conn;
 
+  private
+    $credentials = array();
+
   function __construct($file)
   {
     $newFile = file($file);
-    $credentials = array(); // Array to store credentials
+    // Array to store credentials
 
     foreach ($newFile as $line) //for each line in the file: 
     {
       // Split the line into an array of 2 words: hostname key and credential value.
       $parts = explode('=', $line);
       //Trim whitespace.
-      $credentials[trim($parts[0])] = trim($parts[1]);
+      $this->credentials[trim($parts[0])] = trim($parts[1]);
     }
-    $this->conn = new mysqli($credentials['hostname'], $credentials['username'], $credentials['password'], $credentials['database']);
+    $this->conn = new mysqli($this->credentials['hostname'], $this->credentials['username'], $this->credentials['password'], $this->credentials['database']);
     if ($this->conn->connect_error) {
       exit("Connection failed: " . $this->conn->connect_error);
     } else {
@@ -64,5 +67,30 @@ class DatabaseLogin
         exit;
       }
     }
+  }
+
+  function addUser($username, $password)
+  {
+    $sql = "INSERT INTO users (username, password) VALUES(?, ?);";
+    $sqlStatement = $this->conn->prepare($sql);
+    $sqlStatement->bind_param("ss", $username, $password);
+    $sqlStatement->execute();
+
+    $this->conn->close();
+
+    $this->conn = new mysqli($this->credentials['hostname'], $this->credentials['username'], $this->credentials['password']);
+
+    $sql = "CREATE DATABASE IF NOT EXISTS " . $username;
+    $this->conn->query($sql);
+
+    $sql = "USE " . $username . ";";
+    $this->conn->query($sql);
+
+
+
+    $sql = "CREATE TABLE IF NOT EXISTS times(entry INT PRIMARY KEY AUTO_INCREMENT, startTime DATETIME, endTime DATETIME);";
+    $this->conn->query($sql);
+
+    header("Location: login.php");
   }
 }

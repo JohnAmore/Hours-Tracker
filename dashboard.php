@@ -57,6 +57,7 @@
     // Re-enable the Add Row Button
     function handleCheckboxChange() {
         const addRowButton = document.getElementById('addRowButton');
+
         const checkboxes = document.querySelectorAll('.row-checkbox');
 
         for (let checkbox of checkboxes) {
@@ -91,6 +92,8 @@
                     echo $cookie["user"];
 
                     $dbName = $cookie["user"];
+                } else {
+                    header("Location: login.php");
                 }
                 ?>!
             </h3>
@@ -108,8 +111,10 @@
                     </li>
                     <?php
                     include("readData.php");
+                    include("Parser.php");
 
                     $totalDuration = 0.0;
+                    $duration = 0;
                     if ($db = new DataBaseReader("timeReader.txt", (string) $dbName)) {
                         echo "<script>console.log('Success!')</script>";
                     } else {
@@ -117,32 +122,49 @@
                     }
                     $result = $db->getTimes();
 
-                    for ($i = 0; $i < $result->num_rows; $i++) {
-                        $row = $result->fetch_row();
-                        //Parse times
-                        $startTime = explode(' ', $row[1]);
-                        $endTime = explode(' ', $row[2]);
 
-                        //Create table entry
-                        echo "<li class='table-row'>";
-                        echo "<div class='col col-1'><input type='checkbox' class='row-checkbox' onchange='handleCheckboxChange()'></div>";
-                        echo "<div class='col col-2'>" . $startTime[0] . "</div>";
-                        echo "<div class='col col-3'>" . $startTime[1] . "</div>";
-                        echo "<div class='col col-3'>" . $endTime[1] . "</div>";
-                        echo "<input type='hidden' name='startTime[]' value='" . $startTime[1] . "'>";
-                        echo "<input type='hidden' name='endTime[]' value='" . $endTime[1] . "'>";
-                        echo "<input type='hidden' name='id[]' value='" . $row[0] . "'>";
+                    $parse = new Parser($result);
+
+                    $duration = 0;
+
+                    //Set a day variable that was 2 weeks ago.
+                    $twoWeeksAgo = (new DateTime())->modify('-14 days');
 
 
-                        // Convert time to a timestamp
-                        $startTime = strtotime($row[0]);
-                        $endTime = strtotime($row[1]);
 
-                        $duration = $endTime - $startTime;
 
-                        $totalDuration += $duration;
+                    for ($i = 0; $i < sizeof($result); $i++) {
+                        $startDay = $parse->getStartDate($i);
+                        //Create a copy of startDay and convert it into a DateTime object for comparison
+                        $dateObject = DateTime::createFromFormat('Y-m-d', $startDay);
+                        $startTime = $parse->getStartTime($i);
+                        $endTime = $parse->getEndTime($i);
+                        $id = $parse->getID($i);
+
+
+                        //If the date entry is more recent than 2 weeks ago:
+                        if ($dateObject > $twoWeeksAgo) {
+                            echo "<li class='table-row'>";
+                            echo "<div class='col col-1'><input type='checkbox' class='row-checkbox' onchange='handleCheckboxChange()'></div>";
+                            echo "<div class='col col-2'>" . $startDay . "</div>";
+                            echo "<div class='col col-3'>" . $startTime . "</div>";
+                            echo "<div class='col col-3'>" . $endTime . "</div>";
+                            echo "<input type='hidden' name='startTime[]' value='" . $startTime . "'>";
+                            echo "<input type='hidden' name='endTime[]' value='" . $endTime . "'>";
+                            echo "<input type='hidden' name='id[]' value='" . $id . "'>";
+                            //Find the time difference between times by copying and converting the times into DateTime objects.
+                            $sTimeObject = DateTime::createFromFormat('H:i:s', $startTime);
+                            $eTimeObject = DateTime::createFromFormat('H:i:s', $endTime);
+                            //Get the difference in times by diff method.
+                            $timeDifference = $eTimeObject->diff($sTimeObject);
+                            //Convert time to Hours ratio (2 hours & 30 minutes => 2.5 hours)
+                            $timeDifference = $timeDifference->h + ($timeDifference->i / 60) + ($timeDifference->s / 3600);
+                            //Add time to a total counter.
+                            $duration += $timeDifference;
+                        }
                     }
-                    $totalPay = $totalDuration / 3600 * 12.48;
+                    //Compute Gross Pay
+                    $totalPay = $duration * 12;
 
                     ?>
 
@@ -152,8 +174,8 @@
 
         <div class="button-container">
             <button id="addRowButton" onclick="handleFormSubmit('add.html')" class="SubmitButton">Add Entry</button>
-            <button onclick="handleFormSubmit('modify.php')" class="SubmitButton">Modify Selected Entries</button>
-            <button onclick="handleFormSubmit('delete.php')" class="SubmitButton">Delete Selected Entries</button>
+            <button class="SubmitButton" style="text-decoration: line-through;">Modify Selected Entries</button>
+            <button onclick="handleFormSubmit('delete.php')" class="SubmitButton" id="deleteRowButton">Delete Selected Entries</button>
         </div>
 
     </div>
