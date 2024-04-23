@@ -11,7 +11,7 @@
 
 <script>
     // This determines the .php file that we're redirected to based on the button that's clicked. It also prepares the data we're gonna send.
-    function handleFormSubmit(action) {
+    function formSubmitType(action) {
         const form = document.getElementById('tableForm');
         form.action = action;
 
@@ -83,8 +83,9 @@
             <span class="title">
                 <h2 class="title">Hours Tracker</h2>
             </span>
+
         </div>
-        <div class="greetAndgross">
+        <div class=" greetAndgross">
             <h3 class="greet">Hello,
                 <?php
                 if (isset($_COOKIE['login'])) {
@@ -96,8 +97,12 @@
                     header("Location: login.php");
                 }
                 ?>!
+                <div class="tR">
+                    <label for="payRate">Pay Rate: </label>
+                    <input type="number" id="payRate" name="payRate" value=7.25>
+                </div>
             </h3>
-            <h3 class="gross-pay">Gross Pay:</h3>
+            <h3 class="gross-pay" id="gross-pay">Gross Pay: </h3>
         </div>
 
         <div class="table">
@@ -163,8 +168,6 @@
                             $duration += $timeDifference;
                         }
                     }
-                    //Compute Gross Pay
-                    $totalPay = $duration * 12;
 
                     ?>
 
@@ -173,17 +176,28 @@
         </div>
 
         <div class="button-container">
-            <button id="addRowButton" onclick="handleFormSubmit('add.html')" class="SubmitButton">Add Entry</button>
-            <button class="SubmitButton" style="text-decoration: line-through;">Modify Selected Entries</button>
-            <button onclick="handleFormSubmit('delete.php')" class="SubmitButton" id="deleteRowButton">Delete Selected Entries</button>
+            <button id="addRowButton" onclick="formSubmitType('add.html')" class="SubmitButton">Add Entry</button>
+            <button class="SubmitButton" style="text-decoration: line-through; background-color: red;">Modify Selected Entries(WIP)</button>
+            <button onclick="formSubmitType('delete.php')" class="SubmitButton" id="deleteRowButton">Delete Selected Entries</button>
         </div>
 
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const payRateInput = document.getElementById('payRate');
+            const grossPayDisplay = document.getElementById('gross-pay');
+
+            payRateInput.addEventListener('input', function() {
+                const payRate = parseFloat(payRateInput.value);
+                const hoursWorked = <?php echo $duration ?>;
+                const grossPay = payRate * hoursWorked;
+
+                // Display the calculated gross pay
+                grossPayDisplay.textContent = `Gross Pay: $${grossPay.toFixed(2)}`;
+            });
+        });
         handleCheckboxChange();
-        //Outputs Gross Pay
-        document.querySelector('.gross-pay').textContent = "Gross Pay: $<?php echo number_format($totalPay, 2); ?>";
     </script>
     <footer class="foot">
         <p>Attributions: Stopwatch Icon, <a href="https://www.flaticon.com/free-icons/timer" title="Stopwatch Timer Icon">

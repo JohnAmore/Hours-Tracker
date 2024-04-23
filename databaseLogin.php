@@ -73,7 +73,7 @@ class DatabaseLogin
   {
     $sql = "INSERT INTO users (username, password) VALUES(?, ?);";
     $sqlStatement = $this->conn->prepare($sql);
-    $sqlStatement->bind_param("ss", $username, $password);
+    $sqlStatement->bind_param("ss", $username, (string)$password);
     $sqlStatement->execute();
 
     $this->conn->close();

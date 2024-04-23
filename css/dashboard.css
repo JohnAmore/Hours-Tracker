@@ -42,6 +42,7 @@ body {
 
 .title {
     margin-top: 1rem;
+    flex-basis: 60%;
 }
 
 #icon {
@@ -154,9 +155,6 @@ body {
 }
 
 
-
-
-
 .foot {
     font-family: "Poppins", sans-serif;
     font-weight: 200;
@@ -171,4 +169,9 @@ body {
 footer {
     align-items: center;
     margin-top: auto;
+}
+
+.tR {
+    display: flex;
+    justify-content: space-between
 }
